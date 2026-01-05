@@ -25,18 +25,14 @@ const AnimatedQuestionnaire = () => {
     // Fixed encouragement messages - simpler structure that works for all users
     const encouragements = [
         [
-            "If the sadness comes from your own mistake, Pure joyI would say: Let this pain teach you, not break you... Every experience, even painful ones, shape who you become.",
-            "Every storm runs out of rain. Your strength is inspiring! Remember that rabbits weather storms in their burrows, and emerge stronger. 🌧️➡️🌈",
-            "Your vulnerability shows your strength. Even rabbits show their soft side sometimes. Keep going! 🐰💖",
+            "I understand how difficult that must have been for you. What's important is that every experience, even painful ones, teaches us valuable lessons. Take this as an opportunity to grow stronger and wiser. Remember, I'm here with you through this, and tough times don't last forever."
         ],
         [
-            "Your happiness is a treasure! Keep those memories close to your heart like rabbits store their favorite carrots for winter...",
-            "That's wonderful! Hold onto those happy memories—they're the jewels of life! Rabbits remember safe burrows and sunny meadows. 💎✨",
+            "Your happiness is a treasure! Keep those memories close to your heart like rabbits store their favorite carrots for winter...That's wonderful! Hold onto those happy memories—they're the jewels of life! Rabbits remember safe burrows and sunny meadows. 💎✨",
             "Pure joy! These moments are what make life truly beautiful. Keep smiling! Rabbits show joy with their happy hops. 😊",
         ],
         [
-            "Your dreams have incredible power ✨ I wish that every dream you dare to dream comes true... Rabbits leap forward with faith!",
-            "Your hopes are the seeds of your future. Water them with action and watch them grow! Like rabbits preparing their burrow. 🌱",
+            "Your dreams have incredible power ✨ I wish that every dream you dare to dream comes true... Rabbits leap forward with faith!, Your hopes are the seeds of your future. Water them with action and watch them grow! Like rabbits preparing their burrow. 🌱",
             "Big dreams require big courage—and you've got it! The universe conspires to help dreamers. Rabbits trust their instincts. 🚀",
         ]
     ];
@@ -333,35 +329,36 @@ const AnimatedQuestionnaire = () => {
             // Create celebration effect
             createCelebrationRabbits();
 
-            // Wait for user to read encouragement
-            setTimeout(() => {
-                if (currentStep < 2) {
-                    // Move to next question
-                    setCurrentStep(prev => prev + 1);
-                    setCharacterCount(0);
-                    setShowEncouragement(false);
-                    setIsLoading(false);
+            // Stop loading - wait for user to click "Next Question"
+            setIsLoading(false);
 
-                    // Update rabbits for next step
-                    rabbitsRef.current.forEach(rabbit => {
-                        rabbit.size = isMobile ? (rabbit.id % 3 === 0 ? (isSmallMobile ? 50 : 60) : (isSmallMobile ? 35 : 45)) : (rabbit.id % 3 === 0 ? 80 : 65);
-                        rabbit.speedX = (Math.random() - 0.5) * 0.6;
-                        rabbit.speedY = (Math.random() - 0.5) * 0.4;
-                    });
-                } else {
-                    // Mark as completed in localStorage
-                    const userId = localStorage.getItem('currentUser');
-                    localStorage.setItem(`completed_${userId}`, 'true');
-                    localStorage.setItem(`answers_${userId}`, JSON.stringify(answers));
-
-                    // Go to balloons after delay
-                    setTimeout(() => {
-                        console.log('🎉 All questions completed!');
-                        navigate('/balloons');
-                    }, 2000);
-                }
-            }, 4000);
         }, 1500);
+    };
+
+    // New function to handle moving to next question
+    const handleNextQuestion = () => {
+        if (currentStep < 2) {
+            // Move to next question
+            setCurrentStep(prev => prev + 1);
+            setCharacterCount(0);
+            setShowEncouragement(false);
+
+            // Update rabbits for next step
+            rabbitsRef.current.forEach(rabbit => {
+                rabbit.size = isMobile ? (rabbit.id % 3 === 0 ? (isSmallMobile ? 50 : 60) : (isSmallMobile ? 35 : 45)) : (rabbit.id % 3 === 0 ? 80 : 65);
+                rabbit.speedX = (Math.random() - 0.5) * 0.6;
+                rabbit.speedY = (Math.random() - 0.5) * 0.4;
+            });
+        } else {
+            // Mark as completed in localStorage
+            const userId = localStorage.getItem('currentUser');
+            localStorage.setItem(`completed_${userId}`, 'true');
+            localStorage.setItem(`answers_${userId}`, JSON.stringify(answers));
+
+            // Go to balloons
+            console.log('🎉 All questions completed!');
+            navigate('/balloons');
+        }
     };
 
     const createCelebrationRabbits = () => {
@@ -709,112 +706,44 @@ const AnimatedQuestionnaire = () => {
                 ))}
             </div>
 
-            {/* Question Card - Mobile Optimized */}
-            <div style={{
-                maxWidth: '800px',
-                margin: '0 auto',
-                background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))',
-                backdropFilter: 'blur(20px)',
-                borderRadius: getFontSize('25px', '20px', '18px'),
-                padding: isSmallMobile ? '20px 15px' : (isMobile ? '25px 20px' : '35px 30px'),
-                border: `2px solid ${stepColors[currentStep]}70`,
-                boxShadow: `0 20px 40px rgba(0,0,0,0.5), 
-                           0 0 50px ${stepColors[currentStep]}40,
-                           inset 0 1px 0 rgba(255,255,255,0.1)`,
-                position: 'relative',
-                zIndex: 10,
-                animation: 'slideUp 0.6s ease-out',
-                overflow: 'hidden'
-            }}>
-                {/* Animated border */}
+            {/* Question Card - Mobile Optimized - Only show when not showing encouragement */}
+            {!showEncouragement && (
                 <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    background: `linear-gradient(90deg, ${stepColors[currentStep]}, ${stepColors[(currentStep + 1) % 3]}, ${stepColors[currentStep]})`,
-                    backgroundSize: '200% 100%',
-                    animation: 'borderFlow 3s linear infinite'
-                }} />
-
-                {/* Step Indicator - Mobile Optimized */}
-                <div style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    background: stepColors[currentStep],
-                    color: 'white',
-                    padding: isSmallMobile ? '4px 10px' : '6px 15px',
-                    borderRadius: '20px',
-                    fontSize: getFontSize('14px', '12px', '11px'),
-                    fontWeight: 'bold',
-                    zIndex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: `0 4px 15px ${stepColors[currentStep]}50`
+                    maxWidth: '800px',
+                    margin: '0 auto',
+                    background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: getFontSize('25px', '20px', '18px'),
+                    padding: isSmallMobile ? '20px 15px' : (isMobile ? '25px 20px' : '35px 30px'),
+                    border: `2px solid ${stepColors[currentStep]}70`,
+                    boxShadow: `0 20px 40px rgba(0,0,0,0.5), 
+                               0 0 50px ${stepColors[currentStep]}40,
+                               inset 0 1px 0 rgba(255,255,255,0.1)`,
+                    position: 'relative',
+                    zIndex: 10,
+                    animation: 'slideUp 0.6s ease-out',
+                    overflow: 'hidden'
                 }}>
-                    <span style={{ animation: 'spin 10s linear infinite', fontSize: getFontSize('14px', '12px', '11px') }}>🐇</span>
-                    {stepTitles[currentStep]}
-                </div>
-
-                {/* Question - Mobile Optimized */}
-                <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-                    <div style={{
-                        fontSize: getFontSize('70px', '50px', '40px'),
-                        marginBottom: isSmallMobile ? '10px' : '15px',
-                        animation: 'bounce 3s infinite',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: getFontSize('20px', '15px', '10px')
-                    }}>
-                        <span style={{ animation: 'float 4s infinite' }}>{stepEmojis[currentStep]}</span>
-                        <span style={{
-                            fontSize: getFontSize('40px', '30px', '25px'),
-                            opacity: 0.7,
-                            animation: 'hop 2s infinite 0.3s'
-                        }}>🐰</span>
-                        <span style={{ animation: 'float 4s infinite 0.5s' }}>{stepEmojis[(currentStep + 1) % 3]}</span>
-                    </div>
-
-                    <h2 style={{
-                        fontSize: getFontSize('28px', '22px', '20px'),
-                        fontWeight: 'bold',
-                        marginBottom: isSmallMobile ? '10px' : '15px',
-                        color: '#f1f5f9',
-                        lineHeight: '1.4',
-                        padding: '0 10px',
-                        textShadow: '0 2px 10px rgba(0,0,0,0.3)'
-                    }}>
-                        {questions[currentStep]}
-                    </h2>
-
-                    <p style={{
-                        color: '#94a3b8',
-                        fontSize: getFontSize('16px', '14px', '13px'),
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '10px',
-                        flexWrap: 'wrap'
-                    }}>
-                        <span style={{ animation: 'twinkle 1s infinite' }}>✨</span>
-                        Share from your heart
-                        <span style={{ animation: 'twinkle 1s infinite 0.5s' }}>✨</span>
-                    </p>
-                </div>
-
-                {/* Textarea - Mobile Optimized */}
-                <div style={{ marginBottom: '25px', position: 'relative' }}>
+                    {/* Animated border */}
                     <div style={{
                         position: 'absolute',
-                        top: '-12px',
-                        left: '20px',
-                        background: `linear-gradient(135deg, ${stepColors[currentStep]}, ${stepColors[currentStep]}90)`,
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '3px',
+                        background: `linear-gradient(90deg, ${stepColors[currentStep]}, ${stepColors[(currentStep + 1) % 3]}, ${stepColors[currentStep]})`,
+                        backgroundSize: '200% 100%',
+                        animation: 'borderFlow 3s linear infinite'
+                    }} />
+
+                    {/* Step Indicator - Mobile Optimized */}
+                    <div style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        background: stepColors[currentStep],
                         color: 'white',
-                        padding: isSmallMobile ? '4px 12px' : '6px 20px',
+                        padding: isSmallMobile ? '4px 10px' : '6px 15px',
                         borderRadius: '20px',
                         fontSize: getFontSize('14px', '12px', '11px'),
                         fontWeight: 'bold',
@@ -824,245 +753,315 @@ const AnimatedQuestionnaire = () => {
                         gap: '8px',
                         boxShadow: `0 4px 15px ${stepColors[currentStep]}50`
                     }}>
-                        <span style={{ animation: 'typewriter 2s infinite', fontSize: getFontSize('16px', '14px', '12px') }}>✍️</span>
-                        Your Rabbit Journal
+                        <span style={{ animation: 'spin 10s linear infinite', fontSize: getFontSize('14px', '12px', '11px') }}>🐇</span>
+                        {stepTitles[currentStep]}
                     </div>
 
-                    <textarea
-                        value={answers[currentStep]}
-                        onChange={(e) => handleAnswerChange(e.target.value)}
-                        placeholder={`Type your answer here... 🐰✨
+                    {/* Question - Mobile Optimized */}
+                    <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+                        <div style={{
+                            fontSize: getFontSize('70px', '50px', '40px'),
+                            marginBottom: isSmallMobile ? '10px' : '15px',
+                            animation: 'bounce 3s infinite',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: getFontSize('20px', '15px', '10px')
+                        }}>
+                            <span style={{ animation: 'float 4s infinite' }}>{stepEmojis[currentStep]}</span>
+                            <span style={{
+                                fontSize: getFontSize('40px', '30px', '25px'),
+                                opacity: 0.7,
+                                animation: 'hop 2s infinite 0.3s'
+                            }}>🐰</span>
+                            <span style={{ animation: 'float 4s infinite 0.5s' }}>{stepEmojis[(currentStep + 1) % 3]}</span>
+                        </div>
+
+                        <h2 style={{
+                            fontSize: getFontSize('28px', '22px', '20px'),
+                            fontWeight: 'bold',
+                            marginBottom: isSmallMobile ? '10px' : '15px',
+                            color: '#f1f5f9',
+                            lineHeight: '1.4',
+                            padding: '0 10px',
+                            textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                        }}>
+                            {questions[currentStep]}
+                        </h2>
+
+                        <p style={{
+                            color: '#94a3b8',
+                            fontSize: getFontSize('16px', '14px', '13px'),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            flexWrap: 'wrap'
+                        }}>
+                            <span style={{ animation: 'twinkle 1s infinite' }}>✨</span>
+                            Share from your heart
+                            <span style={{ animation: 'twinkle 1s infinite 0.5s' }}>✨</span>
+                        </p>
+                    </div>
+
+                    {/* Textarea - Mobile Optimized */}
+                    <div style={{ marginBottom: '25px', position: 'relative' }}>
+                        <div style={{
+                            position: 'absolute',
+                            top: '-12px',
+                            left: '20px',
+                            background: `linear-gradient(135deg, ${stepColors[currentStep]}, ${stepColors[currentStep]}90)`,
+                            color: 'white',
+                            padding: isSmallMobile ? '4px 12px' : '6px 20px',
+                            borderRadius: '20px',
+                            fontSize: getFontSize('14px', '12px', '11px'),
+                            fontWeight: 'bold',
+                            zIndex: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            boxShadow: `0 4px 15px ${stepColors[currentStep]}50`
+                        }}>
+                            <span style={{ animation: 'typewriter 2s infinite', fontSize: getFontSize('16px', '14px', '12px') }}>✍️</span>
+                            Your Rabbit Journal
+                        </div>
+
+                        <textarea
+                            value={answers[currentStep]}
+                            onChange={(e) => handleAnswerChange(e.target.value)}
+                            placeholder={`Type your answer here... 🐰✨
 
 Share your thoughts freely - this is your safe space.`}
-                        rows={isSmallMobile ? 5 : 6}
+                            rows={isSmallMobile ? 5 : 6}
+                            style={{
+                                width: '100%',
+                                padding: isSmallMobile ? '15px' : '25px',
+                                fontSize: getFontSize('18px', '16px', '16px'),
+                                borderRadius: '15px',
+                                background: 'rgba(15, 23, 42, 0.9)',
+                                border: `2px solid ${error ? '#ef4444' : stepColors[currentStep] + '80'}`,
+                                color: '#f1f5f9',
+                                outline: 'none',
+                                resize: 'vertical',
+                                fontFamily: 'inherit',
+                                transition: 'all 0.3s',
+                                minHeight: isSmallMobile ? '120px' : '180px',
+                                lineHeight: '1.6',
+                                boxShadow: 'inset 0 4px 20px rgba(0,0,0,0.2)'
+                            }}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = stepColors[currentStep];
+                                e.target.style.boxShadow = `0 0 0 4px ${stepColors[currentStep]}40, inset 0 4px 20px rgba(0,0,0,0.3)`;
+                                e.target.style.transform = 'translateY(-2px)';
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = stepColors[currentStep] + '80';
+                                e.target.style.boxShadow = 'inset 0 4px 20px rgba(0,0,0,0.2)';
+                                e.target.style.transform = 'translateY(0)';
+                            }}
+                        />
+
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: isSmallMobile ? 'column' : 'row',
+                            justifyContent: 'space-between',
+                            marginTop: '15px',
+                            fontSize: getFontSize('15px', '13px', '12px'),
+                            color: '#94a3b8',
+                            alignItems: 'center',
+                            gap: isSmallMobile ? '10px' : '0'
+                        }}>
+                            <span style={{
+                                color: characterCount >= 10 ? '#10B981' : '#ef4444',
+                                fontWeight: characterCount >= 10 ? 'bold' : 'normal',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '5px 15px',
+                                background: characterCount >= 10 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                borderRadius: '15px'
+                            }}>
+                                {characterCount >= 10 ? '✅' : '📝'}
+                                {characterCount} characters
+                                {characterCount >= 10 && <span style={{ animation: 'bounce 1s' }}>🐰</span>}
+                            </span>
+                            <span style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: isSmallMobile ? '5px 15px' : '0'
+                            }}>
+                                <span style={{ animation: 'pulse 2s infinite' }}>✨</span>
+                                Minimum: <strong style={{ color: '#f1f5f9' }}>10</strong> characters
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Error Message */}
+                    {error && (
+                        <div style={{
+                            background: 'rgba(239, 68, 68, 0.2)',
+                            color: '#fecaca',
+                            padding: '15px',
+                            borderRadius: '12px',
+                            marginBottom: '20px',
+                            textAlign: 'center',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            animation: 'shake 0.5s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '15px',
+                            fontSize: getFontSize('16px', '14px', '13px'),
+                            backdropFilter: 'blur(10px)',
+                            flexWrap: 'wrap'
+                        }}>
+                            <span style={{ fontSize: '24px', animation: 'bounce 1s infinite' }}>⚠️</span>
+                            {error}
+                            <span style={{ fontSize: '24px', animation: 'hop 1s infinite 0.5s' }}>🐰</span>
+                        </div>
+                    )}
+
+                    {/* Submit Button - Mobile Optimized */}
+                    <button
+                        onClick={handleSubmitAnswer}
+                        disabled={isLoading || answers[currentStep].length < 10}
                         style={{
                             width: '100%',
-                            padding: isSmallMobile ? '15px' : '25px',
-                            fontSize: getFontSize('18px', '16px', '16px'),
+                            padding: isSmallMobile ? '14px' : (isMobile ? '18px' : '22px'),
+                            background: isLoading
+                                ? 'rgba(107, 114, 128, 0.5)'
+                                : `linear-gradient(135deg, ${stepColors[currentStep]}, ${stepColors[(currentStep + 1) % 3]})`,
+                            color: 'white',
+                            border: 'none',
                             borderRadius: '15px',
-                            background: 'rgba(15, 23, 42, 0.9)',
-                            border: `2px solid ${error ? '#ef4444' : stepColors[currentStep] + '80'}`,
-                            color: '#f1f5f9',
-                            outline: 'none',
-                            resize: 'vertical',
-                            fontFamily: 'inherit',
-                            transition: 'all 0.3s',
-                            minHeight: isSmallMobile ? '120px' : '180px',
-                            lineHeight: '1.6',
-                            boxShadow: 'inset 0 4px 20px rgba(0,0,0,0.2)'
+                            fontSize: getFontSize('20px', '17px', '16px'),
+                            fontWeight: 'bold',
+                            cursor: (isLoading || answers[currentStep].length < 10) ? 'not-allowed' : 'pointer',
+                            opacity: (isLoading || answers[currentStep].length < 10) ? 0.7 : 1,
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            boxShadow: `0 10px 30px ${stepColors[currentStep]}50`,
+                            position: 'relative',
+                            overflow: 'hidden',
+                            letterSpacing: '0.5px'
                         }}
-                        onFocus={(e) => {
-                            e.target.style.borderColor = stepColors[currentStep];
-                            e.target.style.boxShadow = `0 0 0 4px ${stepColors[currentStep]}40, inset 0 4px 20px rgba(0,0,0,0.3)`;
-                            e.target.style.transform = 'translateY(-2px)';
+                        onMouseEnter={(e) => {
+                            if (!isLoading && answers[currentStep].length >= 10) {
+                                e.target.style.transform = 'translateY(-3px)';
+                                e.target.style.boxShadow = `0 15px 35px ${stepColors[currentStep]}70`;
+                            }
                         }}
-                        onBlur={(e) => {
-                            e.target.style.borderColor = stepColors[currentStep] + '80';
-                            e.target.style.boxShadow = 'inset 0 4px 20px rgba(0,0,0,0.2)';
+                        onMouseLeave={(e) => {
                             e.target.style.transform = 'translateY(0)';
+                            e.target.style.boxShadow = `0 10px 30px ${stepColors[currentStep]}50`;
                         }}
-                    />
+                    >
+                        {/* Shine effect */}
+                        <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: '-100%',
+                            width: '100%',
+                            height: '100%',
+                            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                            animation: isLoading ? 'none' : 'shine 3s infinite'
+                        }} />
 
+                        {isLoading ? (
+                            <>
+                                <span style={{
+                                    width: '24px',
+                                    height: '24px',
+                                    border: '3px solid white',
+                                    borderTopColor: 'transparent',
+                                    borderRadius: '50%',
+                                    animation: 'spin 1s linear infinite'
+                                }}></span>
+                                <span>Rabbits are reading...</span>
+                                <span style={{ animation: 'hop 1s infinite' }}>🐰</span>
+                            </>
+                        ) : currentStep < 2 ? (
+                            <>
+                                <span style={{ fontSize: getFontSize('26px', '22px', '20px'), animation: 'bounce 2s infinite' }}>🐇</span>
+                                <span>Share with Me</span>
+                                <span style={{ fontSize: getFontSize('26px', '22px', '20px'), animation: 'float 2s infinite' }}>→</span>
+                            </>
+                        ) : (
+                            <>
+                                <span style={{ fontSize: getFontSize('26px', '22px', '20px'), animation: 'pulse 2s infinite' }}>🎉</span>
+                                <span>Complete Journey</span>
+                                <span style={{ fontSize: getFontSize('26px', '22px', '20px'), animation: 'twinkle 1s infinite' }}>✨</span>
+                            </>
+                        )}
+                    </button>
+
+                    {/* Action Buttons - Mobile Optimized */}
                     <div style={{
                         display: 'flex',
-                        flexDirection: isSmallMobile ? 'column' : 'row',
-                        justifyContent: 'space-between',
-                        marginTop: '15px',
-                        fontSize: getFontSize('15px', '13px', '12px'),
-                        color: '#94a3b8',
-                        alignItems: 'center',
-                        gap: isSmallMobile ? '10px' : '0'
-                    }}>
-                        <span style={{
-                            color: characterCount >= 10 ? '#10B981' : '#ef4444',
-                            fontWeight: characterCount >= 10 ? 'bold' : 'normal',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '5px 15px',
-                            background: characterCount >= 10 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                            borderRadius: '15px'
-                        }}>
-                            {characterCount >= 10 ? '✅' : '📝'}
-                            {characterCount} characters
-                            {characterCount >= 10 && <span style={{ animation: 'bounce 1s' }}>🐰</span>}
-                        </span>
-                        <span style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: isSmallMobile ? '5px 15px' : '0'
-                        }}>
-                            <span style={{ animation: 'pulse 2s infinite' }}>✨</span>
-                            Minimum: <strong style={{ color: '#f1f5f9' }}>10</strong> characters
-                        </span>
-                    </div>
-                </div>
-
-                {/* Error Message */}
-                {error && (
-                    <div style={{
-                        background: 'rgba(239, 68, 68, 0.2)',
-                        color: '#fecaca',
-                        padding: '15px',
-                        borderRadius: '12px',
-                        marginBottom: '20px',
-                        textAlign: 'center',
-                        border: '1px solid rgba(239, 68, 68, 0.3)',
-                        animation: 'shake 0.5s',
-                        display: 'flex',
-                        alignItems: 'center',
                         justifyContent: 'center',
                         gap: '15px',
-                        fontSize: getFontSize('16px', '14px', '13px'),
-                        backdropFilter: 'blur(10px)',
+                        marginTop: '20px',
                         flexWrap: 'wrap'
                     }}>
-                        <span style={{ fontSize: '24px', animation: 'bounce 1s infinite' }}>⚠️</span>
-                        {error}
-                        <span style={{ fontSize: '24px', animation: 'hop 1s infinite 0.5s' }}>🐰</span>
-                    </div>
-                )}
-
-                {/* Submit Button - Mobile Optimized */}
-                <button
-                    onClick={handleSubmitAnswer}
-                    disabled={isLoading || answers[currentStep].length < 10}
-                    style={{
-                        width: '100%',
-                        padding: isSmallMobile ? '14px' : (isMobile ? '18px' : '22px'),
-                        background: isLoading
-                            ? 'rgba(107, 114, 128, 0.5)'
-                            : `linear-gradient(135deg, ${stepColors[currentStep]}, ${stepColors[(currentStep + 1) % 3]})`,
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '15px',
-                        fontSize: getFontSize('20px', '17px', '16px'),
-                        fontWeight: 'bold',
-                        cursor: (isLoading || answers[currentStep].length < 10) ? 'not-allowed' : 'pointer',
-                        opacity: (isLoading || answers[currentStep].length < 10) ? 0.7 : 1,
-                        transition: 'all 0.3s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '10px',
-                        boxShadow: `0 10px 30px ${stepColors[currentStep]}50`,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        letterSpacing: '0.5px'
-                    }}
-                    onMouseEnter={(e) => {
-                        if (!isLoading && answers[currentStep].length >= 10) {
-                            e.target.style.transform = 'translateY(-3px)';
-                            e.target.style.boxShadow = `0 15px 35px ${stepColors[currentStep]}70`;
-                        }
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.boxShadow = `0 10px 30px ${stepColors[currentStep]}50`;
-                    }}
-                >
-                    {/* Shine effect */}
-                    <div style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: '-100%',
-                        width: '100%',
-                        height: '100%',
-                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                        animation: isLoading ? 'none' : 'shine 3s infinite'
-                    }} />
-
-                    {isLoading ? (
-                        <>
-                            <span style={{
-                                width: '24px',
-                                height: '24px',
-                                border: '3px solid white',
-                                borderTopColor: 'transparent',
-                                borderRadius: '50%',
-                                animation: 'spin 1s linear infinite'
-                            }}></span>
-                            <span>Rabbits are reading...</span>
-                            <span style={{ animation: 'hop 1s infinite' }}>🐰</span>
-                        </>
-                    ) : currentStep < 2 ? (
-                        <>
-                            <span style={{ fontSize: getFontSize('26px', '22px', '20px'), animation: 'bounce 2s infinite' }}>🐇</span>
-                            <span>Share with Rabbits</span>
-                            <span style={{ fontSize: getFontSize('26px', '22px', '20px'), animation: 'float 2s infinite' }}>→</span>
-                        </>
-                    ) : (
-                        <>
-                            <span style={{ fontSize: getFontSize('26px', '22px', '20px'), animation: 'pulse 2s infinite' }}>🎉</span>
-                            <span>Complete Journey</span>
-                            <span style={{ fontSize: getFontSize('26px', '22px', '20px'), animation: 'twinkle 1s infinite' }}>✨</span>
-                        </>
-                    )}
-                </button>
-
-                {/* Action Buttons - Mobile Optimized */}
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '15px',
-                    marginTop: '20px',
-                    flexWrap: 'wrap'
-                }}>
-                    {isSmallMobile && (
+                        {isSmallMobile && (
+                            <button
+                                onClick={handleSkipQuestionnaire}
+                                style={{
+                                    background: 'rgba(255,255,255,0.1)',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    color: 'white',
+                                    padding: '8px 12px',
+                                    borderRadius: '10px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    transition: 'all 0.3s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
+                                    flex: 1,
+                                    justifyContent: 'center'
+                                }}
+                                onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
+                                onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.1)'}
+                            >
+                                <span style={{ animation: 'hop 1s infinite' }}>🐇</span>
+                                Skip to Balloons
+                            </button>
+                        )}
                         <button
-                            onClick={handleSkipQuestionnaire}
+                            onClick={() => {
+                                localStorage.removeItem(`completed_${userId}`);
+                                window.location.reload();
+                            }}
                             style={{
-                                background: 'rgba(255,255,255,0.1)',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                color: 'white',
-                                padding: '8px 12px',
+                                background: 'rgba(255,215,0,0.2)',
+                                border: '1px solid rgba(255,215,0,0.3)',
+                                color: '#FFD700',
+                                padding: isSmallMobile ? '8px 12px' : '10px 20px',
                                 borderRadius: '10px',
                                 cursor: 'pointer',
-                                fontSize: '12px',
+                                fontSize: getFontSize('14px', '12px', '12px'),
                                 transition: 'all 0.3s',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '5px',
-                                flex: 1,
-                                justifyContent: 'center'
+                                gap: '8px',
+                                flex: isSmallMobile ? 1 : 'auto'
                             }}
-                            onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
-                            onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.1)'}
+                            onMouseEnter={(e) => e.target.style.background = 'rgba(255,215,0,0.3)'}
+                            onMouseLeave={(e) => e.target.style.background = 'rgba(255,215,0,0.2)'}
                         >
-                            <span style={{ animation: 'hop 1s infinite' }}>🐇</span>
-                            Skip to Balloons
+                            <span>🔄</span>
+                            Restart
                         </button>
-                    )}
-                    <button
-                        onClick={() => {
-                            localStorage.removeItem(`completed_${userId}`);
-                            window.location.reload();
-                        }}
-                        style={{
-                            background: 'rgba(255,215,0,0.2)',
-                            border: '1px solid rgba(255,215,0,0.3)',
-                            color: '#FFD700',
-                            padding: isSmallMobile ? '8px 12px' : '10px 20px',
-                            borderRadius: '10px',
-                            cursor: 'pointer',
-                            fontSize: getFontSize('14px', '12px', '12px'),
-                            transition: 'all 0.3s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            flex: isSmallMobile ? 1 : 'auto'
-                        }}
-                        onMouseEnter={(e) => e.target.style.background = 'rgba(255,215,0,0.3)'}
-                        onMouseLeave={(e) => e.target.style.background = 'rgba(255,215,0,0.2)'}
-                    >
-                        <span>🔄</span>
-                        Restart
-                    </button>
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {/* Encouragement Popup - FIXED AND MOBILE OPTIMIZED */}
+            {/* Encouragement Popup - FIXED: Won't disappear automatically */}
             {showEncouragement && (
                 <div style={{
                     position: 'fixed',
@@ -1148,14 +1147,9 @@ Share your thoughts freely - this is your safe space.`}
                             {encouragementMessage}
                         </div>
 
-                        {/* Continue Button */}
+                        {/* Next Button - User must click to continue */}
                         <button
-                            onClick={() => {
-                                setShowEncouragement(false);
-                                if (currentStep === 2) {
-                                    setTimeout(() => navigate('/balloons'), 500);
-                                }
-                            }}
+                            onClick={handleNextQuestion}
                             style={{
                                 padding: isSmallMobile ? '14px 25px' : (isMobile ? '16px 40px' : '18px 50px'),
                                 background: `linear-gradient(135deg, ${stepColors[currentStep]}, ${stepColors[(currentStep + 1) % 3]})`,
@@ -1175,6 +1169,14 @@ Share your thoughts freely - this is your safe space.`}
                                 width: isSmallMobile ? '100%' : 'auto',
                                 minWidth: isSmallMobile ? 'auto' : '200px'
                             }}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = 'translateY(-3px)';
+                                e.target.style.boxShadow = `0 15px 35px ${stepColors[currentStep]}70`;
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = `0 10px 30px ${stepColors[currentStep]}50`;
+                            }}
                         >
                             {currentStep === 2 ? (
                                 <>
@@ -1190,6 +1192,24 @@ Share your thoughts freely - this is your safe space.`}
                                 </>
                             )}
                         </button>
+
+                        {/* Optional: Add a "Read more" button if message is long */}
+                        {encouragementMessage.length > 200 && (
+                            <p style={{
+                                color: '#94a3b8',
+                                fontSize: getFontSize('14px', '13px', '12px'),
+                                marginTop: '15px',
+                                fontStyle: 'italic',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px'
+                            }}>
+                                <span>📜</span>
+                                Scroll to read the full message
+                                <span>📜</span>
+                            </p>
+                        )}
                     </div>
                 </div>
             )}
