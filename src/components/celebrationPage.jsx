@@ -621,7 +621,7 @@ const CelebrationPage = () => {
                             letterSpacing: getResponsiveSize('0.5px', '0.8px', '1px'),
                             lineHeight: 1.3
                         }}>
-                            Happy Birthday Ammai 💫 
+                            Happy Birthday Ammai 💫
                         </h2>
 
                         <p style={{
@@ -632,6 +632,7 @@ const CelebrationPage = () => {
                             fontStyle: 'italic',
                             textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                         }}>
+                            Mari cringe laga undhi kadha , edhi antha na burraki inthaku minchi idea yem thattaledhu special ga yem ivvala ani so andhukey idhi ,, future lo yepudaina kalisinapudu dhini girinchi matladukoni naccukovachu lee,,, as of now
                             Every moment with you is a celebration for me.So u have to be strong and successfull person.May this year bring you endless happiness, love, and beautiful memories.
                         </p>
                     </div>
